@@ -1,2 +1,5 @@
 # ACTL3182 Group Assignment
-#Members: Gordon Law, Alwin Lee, Jason Leung, Minh Chau Diep
+
+Team Name: Group 30
+Members: Hing Law, Alwin Lee, Jason Leung, Minh Chau Diep
+Project Name: 
