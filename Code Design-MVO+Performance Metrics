@@ -1,0 +1,69 @@
+#MVO+Performance Metrics
+
+library(PortfolioAnalytics)
+library(IntroCompFinR)
+library(reshape2)
+library(moments)
+library(stocks)
+library(quantmod)
+library(xts)
+library(NMOF)
+library(PerformanceAnalytics)
+
+Returns<-read.csv(file=file.choose(),header=TRUE)
+n<-ncol(Returns)
+dates<-read.csv(file=file.choose(),head=FALSE)
+#assumption shortselling allowed
+rf<- 0.0002 #specify risk free rate
+
+#MVO
+cov.mat<-cov(Returns,use="complete.obs")
+mu.vec<-colMeans(Returns,na.rm=TRUE)
+
+gmin.port <- globalMin.portfolio(mu.vec, cov.mat,shorts=TRUE)
+
+
+target.return <- 0.015
+e.port.msft <- efficient.portfolio(mu.vec, cov.mat, target.return,shorts=TRUE)
+
+tan.port <- tangency.portfolio(mu.vec, cov.mat, rf,shorts=TRUE)
+
+ef <-efficient.frontier(mu.vec, cov.mat, alpha.min=-10, 
+                        alpha.max=10, nport=50,shorts=TRUE)
+
+plot(ef, plot.assets=T, col="blue", pch=16) 
+points(gmin.port$sd, gmin.port$er, col="green", pch=16, cex=2) 
+text(gmin.port$sd, gmin.port$er, labels = "Global min", pos = 4) 
+points(tan.port$sd, tan.port$er, col="red", pch=16, cex=2) 
+text(tan.port$sd, tan.port$er, labels = "Tangency", pos = 3) 
+sr.tan = (tan.port$er - rf)/tan.port$sd 
+abline(a=rf, b=sr.tan, col="green", lwd=2)
+
+TangencyReturns<-as.matrix(Returns)%*%tan.port$weights 
+
+TangencyReturns_dataframe<-data.frame(TangencyReturns,row.names = as.Date(dates$V1,format="%d/%m/%Y"))
+
+TimeSeries_TangencyReturns<-xts(TangencyReturns_dataframe$TangencyReturns, order.by = as.Date(dates$V1,format="%d/%m/%Y"))
+
+
+#portfolio measures on tangency portfolio
+sharpe<-SharpeRatio(TimeSeries_TangencyReturns,Rf=rf)
+annualsharpe<-SharpeRatio.annualized(TimeSeries_TangencyReturns,Rf=rf,scale=12)
+adjsharpe<-AdjustedSharpeRatio(TimeSeries_TangencyReturns,Rf=rf)
+sortino<-sortino(TangencyReturns,rf=rf)
+
+
+summary(TangencyReturns)
+skewness(TangencyReturns)
+sd(TangencyReturns)
+kurtosis(TangencyReturns)
+hist(TangencyReturns, breaks=30)
+
+divrat<-divRatio(tan.port$weights,cov.mat)
+downsidedev<-DownsideDeviation(TimeSeries_TangencyReturns,MAR = mean(TangencyReturns[,1])) #specify MAR
+SemiDeviation(TimeSeries_TangencyReturns)
+SemiSD(TimeSeries_TangencyReturns)
+SemiVariance(TimeSeries_TangencyReturns)
+
+
+sspw<-sum(tan.port$weights^2)
