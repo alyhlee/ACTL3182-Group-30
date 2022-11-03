@@ -21,6 +21,8 @@ return_dataset<-return_dataset[-1,]
 return_dataset<-return_dataset[,colSums(return_dataset) != 0]
 'standardised time period of data'
 return_dataset<-return_dataset[1:3980,]
+'match returns to dates'
+row.names(return_dataset)<-row.names(as.data.frame(getSymbols("AAPL", src = 'yahoo', auto.assign = FALSE))[1:3980,])
 write.csv(return_dataset, "stock_returns.csv")
 log_returns<-log(1+return_dataset)
 write.csv(log_returns, "log_returns.csv")
