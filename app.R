@@ -33,7 +33,7 @@ ui <- fluidPage(
       # Input: Selector for choosing dataset ----
       selectInput(inputId = "dataset",
                   label = "Choose a dataset:",
-                  choices = c("TangencyReturns", "GMVPReturns","pricebooktangencyreturns")),
+                  choices = c("TangencyReturns", "GMVPReturns","PBReturns","KReturns")),
       
       # Input: Numeric entry for number of obs to view ----
       #numericInput(inputId = "obs",
@@ -80,7 +80,8 @@ server <- function(input, output) {
     switch(input$dataset,
            "TangencyReturns" = TangencyReturns,
            "GMVPReturns"=GMVPReturns,
-           "pricebooktangencyreturns"=pricebooktangencyreturns)
+           "PBReturns"=pricebooktangencyreturns,
+          "KReturns"=TanReturns
   })
   
   # Create caption ----
