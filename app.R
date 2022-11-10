@@ -10,6 +10,7 @@
 library(shiny)
 load(file='ACTL3182.RData')
 load(file='PricebookTangencyReturns.RData')
+load(file='KMeansReturnsV2.RData')
 # Define UI for dataset viewer app ----
 ui <- fluidPage(
   
