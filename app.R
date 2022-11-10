@@ -6,10 +6,10 @@
 #
 #    http://shiny.rstudio.com/
 #
-load(file='ACTL3182.RData')
 
 library(shiny)
-
+load(file='ACTL3182.RData')
+load(file='_PricebookTangencyReturns_')
 # Define UI for dataset viewer app ----
 ui <- fluidPage(
   
@@ -32,7 +32,7 @@ ui <- fluidPage(
       # Input: Selector for choosing dataset ----
       selectInput(inputId = "dataset",
                   label = "Choose a dataset:",
-                  choices = c("TangencyReturns", "GMVPReturns")),
+                  choices = c("TangencyReturns", "GMVPReturns","pricebooktangencyreturns")),
       
       # Input: Numeric entry for number of obs to view ----
       #numericInput(inputId = "obs",
@@ -78,7 +78,8 @@ server <- function(input, output) {
   datasetInput <- reactive({
     switch(input$dataset,
            "TangencyReturns" = TangencyReturns,
-           "GMVPReturns"=GMVPReturns)
+           "GMVPReturns"=GMVPReturns,
+           "pricebooktangencyreturns"=pricebooktangencyreturns)
   })
   
   # Create caption ----
