@@ -6,6 +6,7 @@
 #
 #    http://shiny.rstudio.com/
 #
+load(file='ACTL3182.RData')
 
 library(shiny)
 
