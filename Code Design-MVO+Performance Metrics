@@ -1,8 +1,5 @@
-#MVO+Performance Metrics
-
 library(PortfolioAnalytics)
 library(IntroCompFinR)
-library(reshape2)
 library(moments)
 library(stocks)
 library(quantmod)
@@ -14,56 +11,67 @@ Returns<-read.csv(file=file.choose(),header=TRUE)
 n<-ncol(Returns)
 dates<-read.csv(file=file.choose(),head=FALSE)
 #assumption shortselling allowed
-rf<- 0.0002 #specify risk free rate
+rf<- 0.00016 #specify risk free rate
+
+trainReturns<-Returns[1:3020,]
+testReturns<-Returns[3021:3980,]
+
+traindates<-dates[1:3020,]
+testdates<-dates[3021:3980,]
+
 
 #MVO
-cov.mat<-cov(Returns,use="complete.obs")
-mu.vec<-colMeans(Returns,na.rm=TRUE)
+cov.mat<-cov(trainReturns,use="complete.obs")
+mu.vec<-colMeans(trainReturns,na.rm=TRUE)
 
-gmin.port <- globalMin.portfolio(mu.vec, cov.mat,shorts=TRUE)
+gmin.port <- globalMin.portfolio(mu.vec, cov.mat,shorts=FALSE)
+
+#target.return <- 0.015
+#e.port.msft <- efficient.portfolio(mu.vec, cov.mat, target.return,shorts=TRUE)
+
+tan.port <- tangency.portfolio(mu.vec, cov.mat, rf,shorts=FALSE)
+
+ef <-efficient.frontier(mu.vec, cov.mat, alpha.min=0, 
+                        alpha.max=1, nport=50,shorts=FALSE)
 
 
-target.return <- 0.015
-e.port.msft <- efficient.portfolio(mu.vec, cov.mat, target.return,shorts=TRUE)
+barplot(head(sort(tan.port$weights,decreasing=TRUE),n=10))
 
-tan.port <- tangency.portfolio(mu.vec, cov.mat, rf,shorts=TRUE)
-
-ef <-efficient.frontier(mu.vec, cov.mat, alpha.min=-10, 
-                        alpha.max=10, nport=50,shorts=TRUE)
 
 plot(ef, plot.assets=T, col="blue", pch=16) 
 points(gmin.port$sd, gmin.port$er, col="green", pch=16, cex=2) 
-text(gmin.port$sd, gmin.port$er, labels = "Global min", pos = 4) 
+text(gmin.port$sd, gmin.port$er, labels = "GMVP", pos = 4) 
 points(tan.port$sd, tan.port$er, col="red", pch=16, cex=2) 
 text(tan.port$sd, tan.port$er, labels = "Tangency", pos = 3) 
 sr.tan = (tan.port$er - rf)/tan.port$sd 
 abline(a=rf, b=sr.tan, col="green", lwd=2)
 
-TangencyReturns<-as.matrix(Returns)%*%tan.port$weights 
+TangencyReturns<-as.matrix(testReturns)%*%tan.port$weights 
 
-TangencyReturns_dataframe<-data.frame(TangencyReturns,row.names = as.Date(dates$V1,format="%d/%m/%Y"))
+TangencyReturns_dataframe<-data.frame(TRET=TangencyReturns,row.names = as.Date(testdates,format="%d/%m/%Y"))
 
-TimeSeries_TangencyReturns<-xts(TangencyReturns_dataframe$TangencyReturns, order.by = as.Date(dates$V1,format="%d/%m/%Y"))
+TimeSeries_TangencyReturns<-xts(TangencyReturns_dataframe$TRET, order.by = as.Date(testdates,format="%d/%m/%Y"))
+
+GMVPReturns<-as.matrix(testReturns)%*%gmin.port$weights 
+
+GMVPReturns_dataframe<-data.frame(GRET=GMVPReturns,row.names = as.Date(testdates,format="%d/%m/%Y"))
 
 
 #portfolio measures on tangency portfolio
-sharpe<-SharpeRatio(TimeSeries_TangencyReturns,Rf=rf)
-annualsharpe<-SharpeRatio.annualized(TimeSeries_TangencyReturns,Rf=rf,scale=12)
-adjsharpe<-AdjustedSharpeRatio(TimeSeries_TangencyReturns,Rf=rf)
-sortino<-sortino(TangencyReturns,rf=rf)
 
+SharpeRatio(TimeSeries_TangencyReturns,Rf=rf)
+SharpeRatio.annualized(TimeSeries_TangencyReturns,Rf=rf,scale=252, geometric=FALSE)
+AdjustedSharpeRatio(TimeSeries_TangencyReturns,Rf=rf,scale=252, geometric=FALSE)
+sortino(TangencyReturns,rf=rf)
 
 summary(TangencyReturns)
 skewness(TangencyReturns)
 sd(TangencyReturns)
 kurtosis(TangencyReturns)
-hist(TangencyReturns, breaks=30)
+mean(TangencyReturns)
 
-divrat<-divRatio(tan.port$weights,cov.mat)
-downsidedev<-DownsideDeviation(TimeSeries_TangencyReturns,MAR = mean(TangencyReturns[,1])) #specify MAR
-SemiDeviation(TimeSeries_TangencyReturns)
+divRatio(tan.port$weights,cov.mat)
+DownsideDeviation(TimeSeries_TangencyReturns,MAR = 0) 
 SemiSD(TimeSeries_TangencyReturns)
-SemiVariance(TimeSeries_TangencyReturns)
 
-
-sspw<-sum(tan.port$weights^2)
+sum((tan.port$weights)^2)
