@@ -81,7 +81,7 @@ server <- function(input, output) {
            "TangencyReturns" = TangencyReturns,
            "GMVPReturns"=GMVPReturns,
            "PBReturns"=pricebooktangencyreturns,
-          "KReturns"=TanReturns
+          "KReturns"=TanReturns)
   })
   
   # Create caption ----
