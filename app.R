@@ -35,7 +35,7 @@ ui <- fluidPage(
       # Input: Selector for choosing dataset ----
       selectInput(inputId = "dataset",
                   label = "Choose a dataset:",
-                  choices = c("TangencyReturns", "GMVPReturns","PBReturns","KReturns","HReturns)),
+                  choices = c("TangencyReturns", "GMVPReturns","PBReturns","KReturns","HReturns")),
       
       # Input: Numeric entry for number of obs to view ----
       #numericInput(inputId = "obs",
