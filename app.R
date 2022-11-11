@@ -11,6 +11,8 @@ library(shiny)
 load(file='ACTL3182.RData')
 load(file='PricebookTangencyReturns.RData')
 load(file='KMeansReturnsV2.RData')
+load(file='HierarchicalReturns.RData')
+
 # Define UI for dataset viewer app ----
 ui <- fluidPage(
   
@@ -33,7 +35,7 @@ ui <- fluidPage(
       # Input: Selector for choosing dataset ----
       selectInput(inputId = "dataset",
                   label = "Choose a dataset:",
-                  choices = c("TangencyReturns", "GMVPReturns","PBReturns","KReturns")),
+                  choices = c("TangencyReturns", "GMVPReturns","PBReturns","KReturns","HReturns)),
       
       # Input: Numeric entry for number of obs to view ----
       #numericInput(inputId = "obs",
@@ -81,7 +83,8 @@ server <- function(input, output) {
            "TangencyReturns" = TangencyReturns,
            "GMVPReturns"=GMVPReturns,
            "PBReturns"=pricebooktangencyreturns,
-          "KReturns"=TanReturns)
+          "KReturns"=TanReturns,
+            "HReturns"=HierarchicalReturns)
   })
   
   # Create caption ----
