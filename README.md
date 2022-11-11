@@ -4,4 +4,4 @@ Team Name: Group 30
 
 Members: Hing Law, Alwin Lee, Jason Leung, Minh Chau Diep
 
-Project Name: 
+Project Name: Network Analysis and the Creation of Diversified Portfolios
