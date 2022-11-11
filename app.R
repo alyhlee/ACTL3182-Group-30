@@ -12,6 +12,10 @@ load(file='ACTL3182.RData')
 load(file='PricebookTangencyReturns.RData')
 load(file='KMeansReturnsV2.RData')
 load(file='HierarchicalReturns.RData')
+load(file='MarketCapReturns.RData')
+load(file='LastPriceReturns.RData')
+load(file='PEReturns.RData')
+load(file='EPSReturns.RData')
 
 # Define UI for dataset viewer app ----
 ui <- fluidPage(
@@ -35,12 +39,18 @@ ui <- fluidPage(
       # Input: Selector for choosing dataset ----
       selectInput(inputId = "dataset",
                   label = "Choose a dataset:",
-                  choices = c("TangencyReturns", "GMVPReturns","PBReturns","KReturns","HReturns")),
+                  choices = c("MVO Tangency", "MVO GMVP",
+                              "K-Means Clustering","Hierarchical Clustering",
+                              "Price to Book Ratio Clustering",
+                              "Earnings Per Share Clustering",
+                              "Last Price Clustering",
+                              "Market Capitalisation Clustering",
+                              "Price to Earnings Ratio Clustering")),
       
       # Input: Numeric entry for number of obs to view ----
       #numericInput(inputId = "obs",
-                   #label = "Number of observations from 2019-01-02:",
-                   #value = 10),
+      #label = "Number of observations from 2019-01-02:",
+      #value = 10),
       
       sliderInput("bins",
                   "Number of bins:",
@@ -48,7 +58,7 @@ ui <- fluidPage(
                   max = 50,
                   value = 30)
       
-      ),
+    ),
     
     # Main panel for displaying outputs ----
     mainPanel(
@@ -80,11 +90,15 @@ server <- function(input, output) {
   #    i.e. it only executes a single time
   datasetInput <- reactive({
     switch(input$dataset,
-           "TangencyReturns" = TangencyReturns,
-           "GMVPReturns"=GMVPReturns,
-           "PBReturns"=pricebooktangencyreturns,
-          "KReturns"=TanReturns,
-            "HReturns"=HierarchicalReturns)
+           
+           
+           "MVO Tangency"=TangencyReturns, "MVO GMVP"=GMVPReturns,
+           "K-Means Clustering"=TanReturns,"Hierarchical Clustering"=HierarchicalReturns,
+           "Price to Book Ratio Clustering"=pricebooktangencyreturns,
+           "Earnings Per Share Clustering"=EPStangencyreturns,
+           "Last Price Clustering"=last.pricetangencyreturns,
+           "Market Capitalisation Clustering"=Marketcaptangencyreturns,
+           "Price to Earnings Ratio Clustering"=PEtangencyreturns)
   })
   
   # Create caption ----
@@ -116,7 +130,7 @@ server <- function(input, output) {
   # expression and input$obs, so it will be re-executed whenever
   # input$dataset or input$obs is changed
   #output$view <- renderTable({
-    #head(datasetInput(), n = input$obs)
+  #head(datasetInput(), n = input$obs)
   #})
   
   output$distPlot <- renderPlot({
